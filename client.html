@@ -41,7 +41,14 @@
             logoutButton.style.display = '';
         })
         .then(client.getConversations)
-        .then((conversations) => conversations.forEach(c => result.innerHTML += '<br>' + c.convId))
+        .then((conversations) => {
+            conversations.reverse();
+            conversations.forEach(c => {
+                if (c.type == 'OPEN' || c.type == 'GROUP') {
+                    result.innerHTML += '<br><span id="' + c.convId + '">' + c.topic + '</span>';
+                }
+            })
+        })
         .catch(err => {
             result.innerHTML = 'Something went wrong.<br><pre>' + JSON.stringify(err) + '</pre>';
         });
