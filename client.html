@@ -29,7 +29,7 @@
     var client = new Circuit.Client({
         client_id: '78cafde2f6854ad5ad80a67c532687bc',
         redirect_uri: 'https://rawgit.com/mailsvb/circuit-apps/master/client.html',
-        scope: 'ALL'
+        scope: 'READ_USER_PROFILE,READ_CONVERSATIONS'
     });
 
     connectButton.addEventListener('click', () => {
