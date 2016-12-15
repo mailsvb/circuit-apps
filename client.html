@@ -46,6 +46,8 @@
             conversations.forEach(c => {
                 if (c.type == 'OPEN' || c.type == 'GROUP') {
                     result.innerHTML += '<br><span id="' + c.convId + '">' + c.topic + '</span>';
+                } else {
+                    result.innerHTML += '<br><span id="' + c.convId + '">DIRECT</span>';
                 }
             })
         })
