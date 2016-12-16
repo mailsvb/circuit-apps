@@ -81,10 +81,12 @@ $('#create').css('display', 'none');
 
 // login
 $('#login').click(function() {
+    /*
     var addr = [];
     $.each($('#allmails').val().split(/[,;\r\n]{1,2}/), function(key, line) {
         addr.push($.trim(line));
     });
+    */
     if ($('#login').text() == "Login") {
         $('#main').text('tyring to login');
         client = new Circuit.Client({
