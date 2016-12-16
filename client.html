@@ -64,6 +64,7 @@ textarea    { height: 200px; }
           <option value="open">create open conversation</option>
           <option value="add">add participants to conversation</option>
         </select>
+        <div id="action" style="text-align: left"></div>
         <!--
         <p><input type="text" id="conversation" placeholder="Conversation name"/></p>
         <p><textarea id="allmails" placeholder="Users Email addresses seperated by comma, semicolon or new line"></textarea></p>
@@ -179,6 +180,8 @@ $('#login').click(function() {
 $('#type').change(function() {
     if ($('#type').val() == "group" || $('#type').val() == "open")
     {
+        $('#action').html('<p><input type="text" id="conversation" placeholder="Conversation name"/></p>' +
+                   '<p><textarea id="allmails" placeholder="Users Email addresses seperated by comma, semicolon or new line"></textarea></p>');
         $('#create').text('Create conversation');
         $('#conversation').attr('placeholder', 'Conversation name');
     }
