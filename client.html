@@ -81,12 +81,6 @@ $('#create').css('display', 'none');
 
 // login
 $('#login').click(function() {
-    /*
-    var addr = [];
-    $.each($('#allmails').val().split(/[,;\r\n]{1,2}/), function(key, line) {
-        addr.push($.trim(line));
-    });
-    */
     if ($('#login').text() == "Login") {
         $('#main').text('tyring to login');
         client = new Circuit.Client({
@@ -122,6 +116,10 @@ $('#login').click(function() {
     }
 });
         /*
+        var addr = [];
+        $.each($('#allmails').val().split(/[,;\r\n]{1,2}/), function(key, line) {
+            addr.push($.trim(line));
+        });
         client.getUsersByEmail(addr).then(function (users) {
             console.log(users);
             $('#main').text('Conversation: "' + $('#conversation').val() + '". Found ' + users.length + ' users.' );
