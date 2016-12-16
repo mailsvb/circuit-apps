@@ -65,28 +65,50 @@ textarea    { height: 200px; }
         </select>
         <p><input type="text" id="conversation" placeholder="Conversation name"/></p>
         <p><textarea id="allmails" placeholder="Users Email addresses seperated by comma, semicolon or new line"></textarea></p>
-        <p><button id="login">Login & Verify users</button>&nbsp;<button id="create" disabled>Create conversation</button></p>
+        <p><button id="create">Create conversation</button></p>
         <div id="main" style="text-align: left"></div>
     </div>
 </div>
 </body>
 <script type="text/javascript">
+// global vars
+var client;
+// init state
+$('#type').prop('disabled', true);
+$('#create').prop('disabled', true);
+
+// login
 $('#login').click(function() {
     var addr = [];
     $.each($('#allmails').val().split(/[,;\r\n]{1,2}/), function(key, line) {
         addr.push($.trim(line));
     });
-    console.log($('#domain').find('option:selected').attr('data-clientid'));
-    //$('#main').text('tyring to login');
-    var client = new Circuit.Client({
-        domain: $('#domain').val(),
-        client_id: $('#domain').find('option:selected').attr('data-clientid'),
-        redirect_uri: 'https://rawgit.com/mailsvb/circuit-apps/master/client.html',
-        scope: 'ALL'
-    });
-    client.logon().then(function (user) {
-        $('#main').html(user.displayName);
-        $('#create').prop('disabled', false);
+    if ($('#login').text() == "Login") {
+        $('#main').text('tyring to login');
+        client = new Circuit.Client({
+            domain: $('#domain').val(),
+            client_id: $('#domain').find('option:selected').attr('data-clientid'),
+            redirect_uri: 'https://rawgit.com/mailsvb/circuit-apps/master/client.html',
+            scope: 'ALL'
+        });
+        client.logon().then(function (user) {
+            $('#main').html("Logged in as " + user.displayName);
+            $('#type').prop('disabled', false);
+            $('#create').prop('disabled', false);
+            $('#login').text("Logout");
+        }, function (err) {
+            $('#main').text(err);
+        });
+    }
+    else {
+        client.logout().then(function() {
+            $('#type').prop('disabled', true);
+            $('#create').prop('disabled', true);
+            $('#login').text("Login");
+            $('#main').text("");
+        });
+    }
+});
         /*
         client.getUsersByEmail(addr).then(function (users) {
             console.log(users);
@@ -141,10 +163,7 @@ $('#login').click(function() {
             $('#main').text(err);
         });
         */
-    }, function (err) {
-        $('#main').text(err);
-    });
-});
+    
 $('#type').change(function() {
     if ($('#type').val() == "group" || $('#type').val() == "open")
     {
