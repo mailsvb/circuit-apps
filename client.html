@@ -2,72 +2,159 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Circuit OAuth2</title>
+    <title>Conversation Organizer</title>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://circuitsandbox.net/circuit.js"></script>
   </head>
-  <body>
-    <h2>Circuit JS-SDK examples</h2>
-    <h3>Circuit OAuth2 (Implicit Flow)</h3>
-    <div>
-      This example shows how to use the JS SDK to login with OAuth and fetch the conversation IDs.
+<style>
+input, select, textarea {
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+    -webkit-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.2);
+       -moz-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.2);
+            box-shadow: inner 0 0 4px rgba(0, 0, 0, 0.2);
+    -webkit-border-radius: 3px;
+       -moz-border-radius: 3px; 
+            border-radius: 3px;
+    width: 500px;
+    line-height: 25px;
+    font-size: 20px;
+    border: 1px solid #2a3136;
+    padding: 5px;
+}
+button {
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+    -webkit-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.2);
+       -moz-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.2);
+            box-shadow: inner 0 0 4px rgba(0, 0, 0, 0.2);
+    -webkit-border-radius: 3px;
+       -moz-border-radius: 3px; 
+            border-radius: 3px;
+    width: 500px;
+    line-height: 25px;
+    font-size: 20px;
+    border: 1px solid #2a3136;
+    padding: 5px;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #88c940;
+}
+input:focus, select:focus, textarea:focus { outline: none !important; border:1px solid #88c940; box-shadow: 0 0 10px #88c940; }
+input       { }
+select      { }
+textarea    { height: 200px; }
+</style>
+</head>
+<body>
+<div style="text-align: center">
+    <div style="display: inline-block;">
+        <select name="domain" id="domain">
+          <option value="eu.yourcircuit.com" data-clientId="0" disabled>eu.yourcircuit.com</option>
+          <option value="na.yourcircuit.com" data-clientId="0" disabled>na.yourcircuit.com</option>
+          <option value="circuitsandbox.net" data-clientId="c7d7baee3d9541f9b5370908b0026cad" selected>circuitsandbox.net</option>
+        </select>
+        <p><button id="login">Login</button></p>
+        <select name="type" id="type">
+          <option value="group" selected>create group conversation</option>
+          <option value="open">create open conversation</option>
+          <option value="add">add participants to conversation</option>
+        </select>
+        <p><input type="text" id="conversation" placeholder="Conversation name"/></p>
+        <p><textarea id="allmails" placeholder="Users Email addresses seperated by comma, semicolon or new line"></textarea></p>
+        <p><button id="login">Login & Verify users</button>&nbsp;<button id="create" disabled>Create conversation</button></p>
+        <div id="main" style="text-align: left"></div>
     </div>
-    <br>
-    <button id="connect">Get my Circuit Conversations</button>
-    <button id="refresh">Refresh page</button>
-    <button id="logout">Logout</button>
-    <pre id="result"></pre>
-
-    <script type="text/javascript">
-
-    var connectButton = document.getElementById('connect');
-    var refreshButton = document.getElementById('refresh');
-    var logoutButton = document.getElementById('logout');
-    var result = document.getElementById('result');
-    refreshButton.style.display = 'none';
-    logoutButton.style.display = 'none';
-
+</div>
+</body>
+<script type="text/javascript">
+$('#login').click(function() {
+    var addr = [];
+    $.each($('#allmails').val().split(/[,;\r\n]{1,2}/), function(key, line) {
+        addr.push($.trim(line));
+    });
+    $('#main').text('tyring to login');
     var client = new Circuit.Client({
-        client_id: 'c7d7baee3d9541f9b5370908b0026cad',
+        domain: $('#domain').val(),
+        client_id: $('#domain').attr('data-clientId'),
         redirect_uri: 'https://rawgit.com/mailsvb/circuit-apps/master/client.html',
         scope: 'ALL'
     });
-
-    connectButton.addEventListener('click', () => {
-        client.logon()
-        .then(user => {
-            result.innerHTML = 'Successfully authenticated as ' + user.displayName;
-            connectButton.style.display = 'none';
-            refreshButton.style.display = '';
-            logoutButton.style.display = '';
-        })
-        .then(client.getConversations)
-        .then((conversations) => {
-            conversations.reverse();
-            conversations.forEach(c => {
-                if (c.type == 'OPEN' || c.type == 'GROUP') {
-                    result.innerHTML += '<br><span id="' + c.convId + '">' + c.topic + '</span>';
-                } else {
-                    result.innerHTML += '<br><span id="' + c.convId + '">DIRECT</span>';
+    client.logon().then(function (user) {
+        $('#main').html(user.displayName);
+        $('#create').prop('disabled', false);
+        /*
+        client.getUsersByEmail(addr).then(function (users) {
+            console.log(users);
+            $('#main').text('Conversation: "' + $('#conversation').val() + '". Found ' + users.length + ' users.' );
+            var userIDs = [];
+            $.each(users, function(key, user) {
+                userIDs.push(user.userId);
+                $('<li>' + user.displayName + ' (' + user.emailAddress + ')</li>').appendTo('#main');
+            });
+            console.log(userIDs);
+            $('#create').click(function() {
+                $('#create').prop('disabled', true);
+                if ($('#type').val() == "group")
+                {
+                    client.createGroupConversation(userIDs, $('#conversation').val()).then(function (newConv) {
+                        $('#main').html('Go, see your conversation <a href="https://' + $('#domain').val() + '/#/conversation/' + newConv.convId + '" target=_blank>here</a>');
+                        client.logout();
+                    }, function (err) {
+                        console.log(err);
+                        client.logout();
+                    });
+                } 
+                else if ($('#type').val() == "open")
+                {
+                    client.createOpenConversation(userIDs, $('#conversation').val()).then(function (newConv) {
+                        $('#main').html('Go, see your conversation <a href="https://' + $('#domain').val() + '/#/conversation/' + newConv.convId + '" target=_blank>here</a>');
+                        client.logout();
+                    }, function (err) {
+                        console.log(err);
+                        client.logout();
+                    });
                 }
-            })
-        })
-        .catch(err => {
-            result.innerHTML = 'Something went wrong.<br><pre>' + JSON.stringify(err) + '</pre>';
+                else if ($('#type').val() == "add")
+                {
+                    $.each(userIDs, function(key, user) {
+                        client.addParticipant($('#conversation').val(), user).then(function () {
+                        
+                        }, function (err) {
+                            $('#main').text(err);
+                        });
+                        if (key == (userIDs.length - 1))
+                        {
+                            setTimeout(function(){
+                                $('#main').html('Go, see your conversation <a href="https://' + $('#domain').val() + '/#/conversation/' + $('#conversation').val() + '" target=_blank>here</a>');
+                                client.logout();
+                            }, 1000);
+                        }
+                    });
+                }
+            });
+        }, function (err) {
+            $('#main').text(err);
         });
+        */
+    }, function (err) {
+        $('#main').text(err);
     });
-
-    logoutButton.addEventListener('click', () => {
-        client.logout().then(() => {
-            refreshButton.style.display = 'none';
-            logoutButton.style.display = 'none'
-            connectButton.style.display = '';
-            result.innerHTML = '';
-        });
-    });
-
-    refreshButton.addEventListener('click', () => {
-        location.reload(false);
-    });
-    </script>
-  </body>
+});
+$('#type').change(function() {
+    if ($('#type').val() == "group" || $('#type').val() == "open")
+    {
+        $('#create').text('Create conversation');
+        $('#conversation').attr('placeholder', 'Conversation name');
+    }
+    else if ($('#type').val() == "add")
+    {
+        $('#create').text('Add participants');
+        $('#conversation').attr('placeholder', 'Conversation ID');
+    }
+});
+</script>
 </html>
