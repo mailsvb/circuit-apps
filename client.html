@@ -59,7 +59,8 @@ textarea    { height: 200px; }
         </select>
         <p><button id="login">Login</button></p>
         <select name="type" id="type">
-          <option value="group" selected>create group conversation</option>
+          <option value="none" selected>please select</option>
+          <option value="group">create group conversation</option>
           <option value="open">create open conversation</option>
           <option value="add">add participants to conversation</option>
         </select>
@@ -106,6 +107,7 @@ $('#login').click(function() {
         client.logout().then(function() {
             // disable elements
             $('#type').prop('disabled', true);
+            $('#type').val('none');
             // hide elements
             $('#create').css('display', 'none');
             // enable elements
