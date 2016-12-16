@@ -63,8 +63,10 @@ textarea    { height: 200px; }
           <option value="open">create open conversation</option>
           <option value="add">add participants to conversation</option>
         </select>
+        <!--
         <p><input type="text" id="conversation" placeholder="Conversation name"/></p>
         <p><textarea id="allmails" placeholder="Users Email addresses seperated by comma, semicolon or new line"></textarea></p>
+        -->
         <p><button id="create">Create conversation</button></p>
         <div id="main" style="text-align: left"></div>
     </div>
@@ -73,9 +75,9 @@ textarea    { height: 200px; }
 <script type="text/javascript">
 // global vars
 var client;
-// init state
+// init elements state
 $('#type').prop('disabled', true);
-$('#create').prop('disabled', true);
+$('#create').css('display', 'none');
 
 // login
 $('#login').click(function() {
@@ -93,8 +95,12 @@ $('#login').click(function() {
         });
         client.logon().then(function (user) {
             $('#main').html("Logged in as " + user.displayName);
+            // enable elements
             $('#type').prop('disabled', false);
-            $('#create').prop('disabled', false);
+            // show elements
+            $('#create').css('display', 'block');
+            // disable elements
+            $('#domain').prop('disabled', true);
             $('#login').text("Logout");
         }, function (err) {
             $('#main').text(err);
@@ -102,8 +108,12 @@ $('#login').click(function() {
     }
     else {
         client.logout().then(function() {
+            // disable elements
             $('#type').prop('disabled', true);
-            $('#create').prop('disabled', true);
+            // hide elements
+            $('#create').css('display', 'none');
+            // enable elements
+            $('#domain').prop('disabled', false);
             $('#login').text("Login");
             $('#main').text("");
         });
