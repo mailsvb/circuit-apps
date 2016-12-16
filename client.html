@@ -53,9 +53,9 @@ textarea    { height: 200px; }
 <div style="text-align: center">
     <div style="display: inline-block;">
         <select name="domain" id="domain">
-          <option value="eu.yourcircuit.com" data-clientId="0" disabled>eu.yourcircuit.com</option>
-          <option value="na.yourcircuit.com" data-clientId="0" disabled>na.yourcircuit.com</option>
-          <option value="circuitsandbox.net" data-clientId="c7d7baee3d9541f9b5370908b0026cad" selected>circuitsandbox.net</option>
+          <option value="eu.yourcircuit.com" data-clientid="0" disabled>eu.yourcircuit.com</option>
+          <option value="na.yourcircuit.com" data-clientid="0" disabled>na.yourcircuit.com</option>
+          <option value="circuitsandbox.net" data-clientid="c7d7baee3d9541f9b5370908b0026cad" selected>circuitsandbox.net</option>
         </select>
         <p><button id="login">Login</button></p>
         <select name="type" id="type">
@@ -76,10 +76,11 @@ $('#login').click(function() {
     $.each($('#allmails').val().split(/[,;\r\n]{1,2}/), function(key, line) {
         addr.push($.trim(line));
     });
-    $('#main').text('tyring to login');
+    console.log($('#domain').find('option:selected').attr('data-clientid'));
+    //$('#main').text('tyring to login');
     var client = new Circuit.Client({
         domain: $('#domain').val(),
-        client_id: $('#domain').attr('data-clientId'),
+        client_id: $('#domain').find('option:selected').attr('data-clientid'),
         redirect_uri: 'https://rawgit.com/mailsvb/circuit-apps/master/client.html',
         scope: 'ALL'
     });
