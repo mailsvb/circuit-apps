@@ -161,7 +161,7 @@ $('#create').click(function() {
     } 
     else if ($('#type').val() == "open")
     {
-      client.createOpenConversation(userIDs, $('#conversation').val()).then(function (newConv) {
+      client.createCommunity(userIDs, $('#conversation').val()).then(function (newConv) {
         $('#main').html('Go, see your conversation <a href="https://' + $('#domain').val() + '/#/conversation/' + newConv.convId + '" target=_blank>here</a>');
       }, function (err) {
         console.log(err);
@@ -171,7 +171,7 @@ $('#create').click(function() {
     else if ($('#type').val() == "add")
     {
       $.each(userIDs, function(key, user) {
-        client.addParticipant($('#conversation').val(), user).then(function () {
+        client.addParticipant($('#myconversations').val(), user).then(function () {
         
         }, function (err) {
           $('#main').text(err);
