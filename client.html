@@ -159,7 +159,7 @@ $('#create').click(function() {
     } 
     else if ($('#type').val() == "open")
     {
-      client.createCommunity(userIDs, $('#conversation').val(), $('#description').val()).then(function (newConv) {
+      client.createCommunity(null, $('#conversation').val(), $('#description').val()).then(function (newConv) {
         $('#main').html('Go, see your conversation <a href="https://' + $('#domain').val() + '/#/conversation/' + newConv.convId + '" target=_blank>here</a>');
       }, function (err) {
         console.log(err);
@@ -177,7 +177,7 @@ $('#create').click(function() {
         if (key == (userIDs.length - 1))
         {
           setTimeout(function(){
-            $('#main').html('Go, see your conversation <a href="https://' + $('#domain').val() + '/#/conversation/' + $('#conversation').val() + '" target=_blank>here</a>');
+            $('#main').html('Go, see your conversation <a href="https://' + $('#domain').val() + '/#/conversation/' + $('#myconversations').val() + '" target=_blank>here</a>');
           }, 1000);
         }
       });
