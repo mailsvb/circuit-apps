@@ -200,12 +200,13 @@ $('#type').change(function() {
     }
     else if ($('#type').val() == "add")
     {
-        $('#action').html('<p><select name="type" id="myconversations"><option value="none" selected>loading conversations...</option></select></p>' +
+        $('#action').html('<p><select name="type" id="myconversations"><option value="none">loading conversations...</option></select></p>' +
                    '<p><textarea id="allmails" placeholder="Users Email addresses seperated by comma, semicolon or new line"></textarea></p>');
         $('#create').text('Add participants');
         if (myconversations.length > 0) {
+            $('#myconversations option[value=\'none\']').remove();
             $.each(myconversations, function(key, conv) {
-                $('#myconversations').append($('<option></option>').val(conv.convId).html(conv.topic));
+                $('#myconversations').append('<option value="' + conv.convId + '">' + conv.topic + '</option>');
             });
         }
     }
