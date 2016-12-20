@@ -51,27 +51,23 @@ textarea    { height: 200px; }
 </head>
 <body>
 <div style="text-align: center">
-    <div style="display: inline-block;">
-        <select name="domain" id="domain">
-          <option value="eu.yourcircuit.com" data-clientid="0" disabled>eu.yourcircuit.com</option>
-          <option value="na.yourcircuit.com" data-clientid="0" disabled>na.yourcircuit.com</option>
-          <option value="circuitsandbox.net" data-clientid="c7d7baee3d9541f9b5370908b0026cad" selected>circuitsandbox.net</option>
-        </select>
-        <p><button id="login">Login</button></p>
-        <select name="type" id="type">
-          <option value="none" selected>please select</option>
-          <option value="group">create group conversation</option>
-          <option value="open">create community</option>
-          <option value="add">add participants to conversation</option>
-        </select>
-        <div id="action" style="text-align: left"></div>
-        <!--
-        <p><input type="text" id="conversation" placeholder="Conversation name"/></p>
-        <p><textarea id="allmails" placeholder="Users Email addresses seperated by comma, semicolon or new line"></textarea></p>
-        -->
-        <p><button id="create">Create conversation</button></p>
-        <div id="main" style="text-align: left"></div>
-    </div>
+  <div style="display: inline-block;">
+    <select name="domain" id="domain">
+      <option value="eu.yourcircuit.com" data-clientid="0" disabled>eu.yourcircuit.com</option>
+      <option value="na.yourcircuit.com" data-clientid="0" disabled>na.yourcircuit.com</option>
+      <option value="circuitsandbox.net" data-clientid="c7d7baee3d9541f9b5370908b0026cad" selected>circuitsandbox.net</option>
+    </select>
+    <p><button id="login">Login</button></p>
+    <select name="type" id="type">
+      <option value="none" selected>please select</option>
+      <option value="group">create group conversation</option>
+      <option value="open">create community</option>
+      <option value="add">add participants to conversation</option>
+    </select>
+    <div id="action" style="text-align: left"></div>
+    <p><button id="create">Create conversation</button></p>
+    <div id="main" style="text-align: left"></div>
+  </div>
 </div>
 </body>
 <script type="text/javascript">
@@ -84,56 +80,56 @@ $('#create').css('display', 'none');
 
 // login
 $('#login').click(function() {
-    if ($('#login').text() == "Login") {
-        $('#main').text('tyring to login');
-        client = new Circuit.Client({
-            domain: $('#domain').val(),
-            client_id: $('#domain').find('option:selected').attr('data-clientid'),
-            redirect_uri: 'https://rawgit.com/mailsvb/circuit-apps/master/client.html',
-            scope: 'ALL'
+  if ($('#login').text() == "Login") {
+    $('#main').text('tyring to login');
+    client = new Circuit.Client({
+      domain: $('#domain').val(),
+      client_id: $('#domain').find('option:selected').attr('data-clientid'),
+      redirect_uri: 'https://rawgit.com/mailsvb/circuit-apps/master/client.html',
+      scope: 'ALL'
+    });
+    client.logon().then(function (user) {
+      $('#main').html("Logged in as " + user.displayName);
+      // enable elements
+      $('#type').prop('disabled', false);
+      // show elements
+      $('#create').css('display', 'block');
+      // disable elements
+      $('#domain').prop('disabled', true);
+      $('#login').text("Logout");
+      client.getConversations({numberOfConversations: 10000}).then(function (conversations) {
+        conversations.reverse();
+        myconversations = [];
+        $.each(conversations, function(key, conv) {
+          console.log(conv);
+          if (conv.type == 'OPEN' || conv.type == 'GROUP') {
+            if ($('#myconversations').length == 0 && myconversations.length == 0) {
+              $('#myconversations').append($('<option></option>').val(conv.convId).html(conv.topic));
+            }
+            myconversations.push(conv);
+          }
         });
-        client.logon().then(function (user) {
-            $('#main').html("Logged in as " + user.displayName);
-            // enable elements
-            $('#type').prop('disabled', false);
-            // show elements
-            $('#create').css('display', 'block');
-            // disable elements
-            $('#domain').prop('disabled', true);
-            $('#login').text("Logout");
-            client.getConversations({numberOfConversations: 10000}).then(function (conversations) {
-                conversations.reverse();
-                myconversations = [];
-                $.each(conversations, function(key, conv) {
-                    console.log(conv);
-                    if (conv.type == 'OPEN' || conv.type == 'GROUP') {
-                        if ($('#myconversations').length == 0 && myconversations.length == 0) {
-                            $('#myconversations').append($('<option></option>').val(conv.convId).html(conv.topic));
-                        }
-                        myconversations.push(conv);
-                    }
-                });
-            }, function (err) {
-                $('#main').text(err);
-            });
-        }, function (err) {
-            $('#main').text(err);
-        });
-    }
-    else {
-        client.logout().then(function() {
-            // disable elements
-            $('#type').prop('disabled', true);
-            $('#type').val('none');
-            // hide elements
-            $('#create').css('display', 'none');
-            $('#action').html("");
-            // enable elements
-            $('#domain').prop('disabled', false);
-            $('#login').text("Login");
-            $('#main').text("");
-        });
-    }
+      }, function (err) {
+        $('#main').text(err);
+      });
+    }, function (err) {
+      $('#main').text(err);
+    });
+  }
+  else {
+    client.logout().then(function() {
+      // disable elements
+      $('#type').prop('disabled', true);
+      $('#type').val('none');
+      // hide elements
+      $('#create').css('display', 'none');
+      $('#action').html("");
+      // enable elements
+      $('#domain').prop('disabled', false);
+      $('#login').text("Login");
+      $('#main').text("");
+    });
+  }
 });
 
 $('#create').click(function() {
@@ -163,7 +159,7 @@ $('#create').click(function() {
     } 
     else if ($('#type').val() == "open")
     {
-      client.createCommunity(userIDs, $('#conversation').val()).then(function (newConv) {
+      client.createCommunity(userIDs, $('#conversation').val(), $('#description').val()).then(function (newConv) {
         $('#main').html('Go, see your conversation <a href="https://' + $('#domain').val() + '/#/conversation/' + newConv.convId + '" target=_blank>here</a>');
       }, function (err) {
         console.log(err);
@@ -190,91 +186,33 @@ $('#create').click(function() {
     $('#main').text(err);
   });
 });
-        /*
-        var addr = [];
-        $.each($('#allmails').val().split(/[,;\r\n]{1,2}/), function(key, line) {
-            addr.push($.trim(line));
-        });
-        client.getUsersByEmail(addr).then(function (users) {
-            console.log(users);
-            $('#main').text('Conversation: "' + $('#conversation').val() + '". Found ' + users.length + ' users.' );
-            var userIDs = [];
-            $.each(users, function(key, user) {
-                userIDs.push(user.userId);
-                $('<li>' + user.displayName + ' (' + user.emailAddress + ')</li>').appendTo('#main');
-            });
-            console.log(userIDs);
-            $('#create').click(function() {
-                $('#create').prop('disabled', true);
-                if ($('#type').val() == "group")
-                {
-                    client.createGroupConversation(userIDs, $('#conversation').val()).then(function (newConv) {
-                        $('#main').html('Go, see your conversation <a href="https://' + $('#domain').val() + '/#/conversation/' + newConv.convId + '" target=_blank>here</a>');
-                        client.logout();
-                    }, function (err) {
-                        console.log(err);
-                        client.logout();
-                    });
-                } 
-                else if ($('#type').val() == "open")
-                {
-                    client.createOpenConversation(userIDs, $('#conversation').val()).then(function (newConv) {
-                        $('#main').html('Go, see your conversation <a href="https://' + $('#domain').val() + '/#/conversation/' + newConv.convId + '" target=_blank>here</a>');
-                        client.logout();
-                    }, function (err) {
-                        console.log(err);
-                        client.logout();
-                    });
-                }
-                else if ($('#type').val() == "add")
-                {
-                    $.each(userIDs, function(key, user) {
-                        client.addParticipant($('#conversation').val(), user).then(function () {
-                        
-                        }, function (err) {
-                            $('#main').text(err);
-                        });
-                        if (key == (userIDs.length - 1))
-                        {
-                            setTimeout(function(){
-                                $('#main').html('Go, see your conversation <a href="https://' + $('#domain').val() + '/#/conversation/' + $('#conversation').val() + '" target=_blank>here</a>');
-                                client.logout();
-                            }, 1000);
-                        }
-                    });
-                }
-            });
-        }, function (err) {
-            $('#main').text(err);
-        });
-        */
-    
+
 $('#type').change(function() {
-    if ($('#type').val() == "group")
-    {
-      $('#action').html('<p><input type="text" id="conversation" placeholder="Conversation name"/></p>' +
-                 '<p><textarea id="allmails" placeholder="Users Email addresses seperated by comma, semicolon or new line"></textarea></p>');
-      $('#create').text('Create conversation');
+  if ($('#type').val() == "group")
+  {
+    $('#action').html('<p><input type="text" id="conversation" placeholder="Conversation name"/></p>' +
+                      '<p><textarea id="allmails" placeholder="Users Email addresses seperated by comma, semicolon or new line"></textarea></p>');
+    $('#create').text('Create conversation');
+  }
+  else if ($('#type').val() == "open")
+  {
+    $('#action').html('<p><input type="text" id="conversation" placeholder="Community name"/></p>' +
+                      '<p><input type="text" id="description" placeholder="Community description"/></p>' +
+                      '<p><textarea id="allmails" placeholder="Users Email addresses seperated by comma, semicolon or new line"></textarea></p>');
+    $('#create').text('Create community');
+  }
+  else if ($('#type').val() == "add")
+  {
+    $('#action').html('<p><select name="type" id="myconversations"><option value="none">loading conversations...</option></select></p>' +
+                      '<p><textarea id="allmails" placeholder="Users Email addresses seperated by comma, semicolon or new line"></textarea></p>');
+    $('#create').text('Add participants');
+    if (myconversations.length > 0) {
+      $('#myconversations option[value=\'none\']').remove();
+      $.each(myconversations, function(key, conv) {
+        $('#myconversations').append('<option value="' + conv.convId + '">' + conv.topic + '</option>');
+      });
     }
-    else if ($('#type').val() == "open")
-    {
-      $('#action').html('<p><input type="text" id="conversation" placeholder="Community name"/></p>' +
-                        '<p><input type="text" id="description" placeholder="Community description"/></p>' +
-                        '<p><textarea id="allmails" placeholder="Users Email addresses seperated by comma, semicolon or new line"></textarea></p>');
-      $('#create').text('Create community');
-    }
-    else if ($('#type').val() == "add")
-    {
-        $('#action').html('<p><select name="type" id="myconversations"><option value="none">loading conversations...</option></select></p>' +
-                   '<p><textarea id="allmails" placeholder="Users Email addresses seperated by comma, semicolon or new line"></textarea></p>');
-        $('#create').text('Add participants');
-        if (myconversations.length > 0) {
-            $('#myconversations option[value=\'none\']').remove();
-            $.each(myconversations, function(key, conv) {
-                $('#myconversations').append('<option value="' + conv.convId + '">' + conv.topic + '</option>');
-            });
-        }
-    }
+  }
 });
 </script>
 </html>
