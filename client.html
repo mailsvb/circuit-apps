@@ -159,7 +159,7 @@ $('#create').click(function() {
     } 
     else if ($('#type').val() == "open")
     {
-      client.createCommunity(null, $('#conversation').val(), $('#description').val()).then(function (newConv) {
+      client.createCommunity(userIDs, $('#conversation').val(), $('#description').val()).then(function (newConv) {
         $('#main').html('Go, see your conversation <a href="https://' + $('#domain').val() + '/#/conversation/' + newConv.convId + '" target=_blank>here</a>');
       }, function (err) {
         console.log(err);
