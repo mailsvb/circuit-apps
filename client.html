@@ -111,6 +111,8 @@ $('#login').click(function() {
                         myconversations.push(conv);
                     }
                 });
+            }, function (err) {
+                $('#main').text(err);
             });
         }, function (err) {
             $('#main').text(err);
@@ -130,6 +132,61 @@ $('#login').click(function() {
             $('#main').text("");
         });
     }
+});
+
+$('#create').click(function() {
+  if ($('#type').find('option:selected').val() == "none") {
+    return;
+  }
+  var addr = [];
+  $.each($('#allmails').val().split(/[,;\r\n]{1,2}/), function(key, line) {
+    addr.push($.trim(line));
+  });
+  client.getUsersByEmail(addr).then(function (users) {
+    console.log(users);
+    $('#main').text('Found ' + users.length + ' users.');
+    var userIDs = [];
+    $.each(users, function(key, user) {
+        userIDs.push(user.userId);
+        $('<li>' + user.displayName + ' (' + user.emailAddress + ')</li>').appendTo('#main');
+    });
+    if ($('#type').val() == "group")
+    {
+      client.createGroupConversation(userIDs, $('#conversation').val()).then(function (newConv) {
+        $('#main').html('Go, see your conversation <a href="https://' + $('#domain').val() + '/#/conversation/' + newConv.convId + '" target=_blank>here</a>');
+      }, function (err) {
+        console.log(err);
+        $('#main').text(err);
+      });
+    } 
+    else if ($('#type').val() == "open")
+    {
+      client.createOpenConversation(userIDs, $('#conversation').val()).then(function (newConv) {
+        $('#main').html('Go, see your conversation <a href="https://' + $('#domain').val() + '/#/conversation/' + newConv.convId + '" target=_blank>here</a>');
+      }, function (err) {
+        console.log(err);
+        $('#main').text(err);
+      });
+    }
+    else if ($('#type').val() == "add")
+    {
+      $.each(userIDs, function(key, user) {
+        client.addParticipant($('#conversation').val(), user).then(function () {
+        
+        }, function (err) {
+          $('#main').text(err);
+        });
+        if (key == (userIDs.length - 1))
+        {
+          setTimeout(function(){
+            $('#main').html('Go, see your conversation <a href="https://' + $('#domain').val() + '/#/conversation/' + $('#conversation').val() + '" target=_blank>here</a>');
+          }, 1000);
+        }
+      });
+    }
+  }, function (err) {
+    $('#main').text(err);
+  });
 });
         /*
         var addr = [];
