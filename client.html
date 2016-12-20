@@ -61,7 +61,7 @@ textarea    { height: 200px; }
         <select name="type" id="type">
           <option value="none" selected>please select</option>
           <option value="group">create group conversation</option>
-          <option value="open">create open conversation</option>
+          <option value="open">create community</option>
           <option value="add">add participants to conversation</option>
         </select>
         <div id="action" style="text-align: left"></div>
@@ -250,12 +250,18 @@ $('#create').click(function() {
         */
     
 $('#type').change(function() {
-    if ($('#type').val() == "group" || $('#type').val() == "open")
+    if ($('#type').val() == "group")
     {
-        $('#action').html('<p><input type="text" id="conversation" placeholder="Conversation name"/></p>' +
-                   '<p><textarea id="allmails" placeholder="Users Email addresses seperated by comma, semicolon or new line"></textarea></p>');
-        $('#create').text('Create conversation');
-        $('#conversation').attr('placeholder', 'Conversation name');
+      $('#action').html('<p><input type="text" id="conversation" placeholder="Conversation name"/></p>' +
+                 '<p><textarea id="allmails" placeholder="Users Email addresses seperated by comma, semicolon or new line"></textarea></p>');
+      $('#create').text('Create conversation');
+    }
+    else if ($('#type').val() == "open")
+    {
+      $('#action').html('<p><input type="text" id="conversation" placeholder="Community name"/></p>' +
+                        '<p><input type="text" id="description" placeholder="Community description"/></p>' +
+                        '<p><textarea id="allmails" placeholder="Users Email addresses seperated by comma, semicolon or new line"></textarea></p>');
+      $('#create').text('Create community');
     }
     else if ($('#type').val() == "add")
     {
