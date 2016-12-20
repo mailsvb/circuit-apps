@@ -103,7 +103,9 @@ $('#login').click(function() {
             $('#login').text("Logout");
             client.getConversations({numberOfConversations: 10000}).then(function (conversations) {
                 conversations.reverse();
+                myconversations = [];
                 $.each(conversations, function(key, conv) {
+                    console.log(conv);
                     if (conv.type == 'OPEN' || conv.type == 'GROUP') {
                         if ($('#myconversations').length == 0 && myconversations.length == 0) {
                             $('#myconversations').append($('<option></option>').val(conv.convId).html(conv.topic));
